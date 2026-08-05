@@ -1,0 +1,155 @@
+First task on pyhton regarding the creating the pivot table from .cvs raw file.
+So we want to install the pands and plotly into the qa intance labs
+using pands we can convert the .csv file into pivot table.
+After doing my changes into branch i am getting below error 
+
+"SyntaxError: Positional argument cannot follow keyword argument"
+
+Solution from chatgpt is :- when you define a function call (or any function-related syntax) with positional arguments placed after keyword arguments.
+In Python, positional arguments must come before keyword arguments in any function call.
+Correct way is :- result = example(1, 2, c=3)
+
+below is pivot table code
+/*
+df = pd.read_csv (args.series_name)
+
+print(df)
+
+pivot_table = df.pivot_table(
+df,
+index= ['Column labels', 'Row labels'],
+values= ['Sum of requests', 'Average of rps' , 'Average of http_p(95)' , 'Average of oseries_p(95)'],
+columns= ['invoiceAddress', 'invoiceTaid', 'quoteAddress', 'quoteTaid'],
+aggfunc= ['sum','mean']
+)
+
+process_results (print(pivot_table))
+
+*/
+
+Fetch the .csv file from s3 bucket and convert it into pivot table and then put the path into github action and then upload it to dynamob db.
+
+Firstly i want to see the where the .csv file is picking up from the s3 bucket is result_proccessor.py ( 2/4/25)
+
+------
+Added some code changes in result.processor.py by the online ai and tools
+and we can't use COM for this excel operation, the reason is below.
+You should stick with the openpyxl library, which is already being used in the improved code. 
+It provides a robust and platform-independent way to create Excel files with features like dropdown lists. 
+Trying to integrate COM would introduce unnecessary dependencies and complications.
+
+-----------
+
+using mscom we are able do the changes so yeah first output from chatgpt
+
+import win32com.client as win32
+
+# Open Excel
+excel = win32.Dispatch("Excel.Application")
+excel.Visible = True  # Set to False to run in background
+
+# Open CSV file
+workbook = excel.Workbooks.Open(r"C:\path\to\your\file.csv")
+
+# Get the active sheet (CSV opens as a single sheet)
+sheet = workbook.Sheets(1)
+
+# Find last row and column
+last_row = sheet.Cells(sheet.Rows.Count, 1).End(-4162).Row  # xlUp
+last_col = sheet.Cells(1, sheet.Columns.Count).End(-4159).Column  # xlToLeft
+
+# Define range for pivot table source
+source_range = sheet.Range(sheet.Cells(1, 1), sheet.Cells(last_row, last_col))
+
+# Add a new worksheet for the pivot table
+pivot_sheet = workbook.Sheets.Add()
+pivot_sheet.Name = "PivotTableSheet"
+
+# Define pivot table cache
+pivot_cache = workbook.PivotCaches().Create(1, source_range)  # xlDatabase
+
+# Create Pivot Table
+pivot_table = pivot_cache.CreatePivotTable(pivot_sheet.Cells(1, 1), "PivotTable1")
+
+# Configure Pivot Table fields (adjust based on your CSV structure)
+pivot_table.PivotFields("ColumnName1").Orientation = 1  # xlRowField
+pivot_table.PivotFields("ColumnName2").Orientation = 2  # xlColumnField
+pivot_table.PivotFields("ValueColumn").Orientation = 3  # xlDataField
+
+# Save the file as an Excel file
+workbook.SaveAs(r"C:\path\to\your\output.xlsx", FileFormat=51)  # xlOpenXMLWorkbook
+
+# Close Excel
+workbook.Close(True)
+excel.Quit()
+
+-----------------------------------------------------------------
+
+the hint given by the andy for this task and he told this maybe answer also....
+
+another hint, looks like this is the answer
+COM (Component Object Model)
+COM is a Microsoft technology that allows software components to communicate with each other.
+COM Automation: Specifically, it refers to using COM Automation to control Excel from another application, such as a script or a program written in languages like Python, VBA, or C#.
+Excel COM Object Model: Provides a way to interact with Excel's features and functionalities programmatically.
+ 
+ 
+start off with pivoting just one field, this will remove some complication and allow for faster results
+ ---------------------------------------------------------------
+
+import win32com.client as win32
+
+# Open Excel
+excel = win32.Dispatch("Excel.Application")
+excel.Visible = True  # Set to False to run in the background
+
+# Open the CSV file (Replace with your file path)
+csv_file_path = r"C:\path\to\your\file.csv"
+workbook = excel.Workbooks.Open(csv_file_path)
+
+# Get the active sheet (CSV opens as a single sheet)
+sheet = workbook.Sheets(1)
+
+# Find last row and column dynamically
+last_row = sheet.Cells(sheet.Rows.Count, 1).End(-4162).Row  # xlUp
+last_col = sheet.Cells(1, sheet.Columns.Count).End(-4159).Column  # xlToLeft
+
+# Define the data range
+data_range = sheet.Range(sheet.Cells(1, 1), sheet.Cells(last_row, last_col))
+
+# Add a new worksheet for the Pivot Table
+pivot_sheet = workbook.Sheets.Add()
+pivot_sheet.Name = "PivotTableSheet"
+
+# Create Pivot Cache
+pivot_cache = workbook.PivotCaches().Create(1, data_range)  # xlDatabase
+
+# Create Pivot Table
+pivot_table = pivot_cache.CreatePivotTable(pivot_sheet.Cells(1, 1), "PivotTable1")
+
+# Set "Volume" as Row Field (Grouping)
+pivot_table.PivotFields("Volume").Orientation = 1  # xlRowField
+
+# Columns to SUM
+sum_columns = ["Sales", "Profit"]
+
+# Columns to AVERAGE
+avg_columns = ["Discount", "Margin"]
+
+# Apply SUM
+for col in sum_columns:
+    pivot_table.AddDataField(pivot_table.PivotFields(col), f"Total {col}", -4157)  # xlSum
+
+# Apply AVERAGE
+for col in avg_columns:
+    pivot_table.AddDataField(pivot_table.PivotFields(col), f"Avg {col}", -4106)  # xlAverage
+
+# Save as Excel file
+output_file = r"C:\path\to\your\output.xlsx"
+workbook.SaveAs(output_file, FileFormat=51)  # xlOpenXMLWorkbook
+
+# Close Excel
+workbook.Close(True)
+excel.Quit()
+
+print(f"Pivot table created with SUM & AVERAGE for specified columns in {output_file}")

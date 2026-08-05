@@ -1,0 +1,3 @@
+1)what is dynamo db
+2)how this storage have capacity to store, what are the things required it
+3)look out for release in github action and learn about changelog

@@ -1,0 +1,101 @@
+def main():
+    # Get environment variables
+    s3_bucket = os.environ.get("S3_BUCKET")
+    s3_key = os.environ.get("S3_KEY")  # S3 key of the CSV file
+    output_s3_key = os.environ.get("OUTPUT_S3_KEY") # S3 key for the output Excel file
+
+    if not all([s3_bucket, s3_key, output_s3_key]):
+        logger.error("Missing required environment variables: S3_BUCKET, S3_KEY, OUTPUT_S3_KEY")
+        return
+
+    # Download CSV file from S3
+    try:
+        temp_dir = "/tmp" # Use /tmp directory for Lambda
+        os.makedirs(temp_dir, exist_ok=True)
+        csv_file_path = os.path.join(temp_dir, os.path.basename(s3_key))
+        s3.download_file(s3_bucket, s3_key, csv_file_path)
+        logger.info(f"Downloaded CSV file from S3: {s3_key}")
+
+    except ClientError as e:
+        logger.error(f"Error downloading from S3: {e.response['Error']['Message']}")
+        return
+
+    # Create pivot table
+    output_file_path = os.path.join(temp_dir, os.path.basename(output_s3_key))
+    pivot_file_path = create_pivot_table(csv_file_path, output_file_path)
+
+    if pivot_file_path:
+        # Upload pivot table to S3
+        try:
+            s3.upload_file(pivot_file_path, s3_bucket, output_s3_key)
+            logger.info(f"Uploaded pivot table to S3: {output_s3_key}")
+        except ClientError as e:
+            logger.error(f"Error uploading to S3: {e.response['Error']['Message']}")
+
+
+if __name__ == "__main__":
+    main()
+
+----------------------------------------------------------------------------------------------------------------------------
+
+firstly install "pip install pywin32"
+
+win32com module is the part of pywin32 package, is used in python to interact with COM (component object model) objects, such as microsoft excel. it enables
+automation of excel tasks without manually openinf the application.
+
+
+import win32com.client as win32
+
+def clear_pts(ws)
+    for pt in ws.PivotTables():
+        pt.TableRange2.Clear()
+
+def insert_pt_field_set1(pt):
+    field_rows = {}
+    field_rows['Request'] = pt.PivotField("Sum of request")
+    field_rows['http90'] = pt.PivotField("avg of http90")
+    field_rows['http95'] = pt.PivotField("avg of http95")
+    field_rows['rps'] = pt.PivotField("avg of rps")
+    
+    field_values = {}
+    field_values ['oseries_version'] = pt.PivotFields("")
+    field_values ['oseries_version'] = pt.PivotFields("")
+
+#insert fields to pivot table design
+    
+    field_rows['']
+    
+
+#launch Excel application
+
+xlapp = win32.Dispatch('Excel.Application')
+xlapp.Visible = True
+
+#reference workbook
+wb = xlapp.Workbooks.open(r"path of xlsm file")
+
+#refernce worksheets
+ws_data = wb.Worksheets("Data")
+ws_report = wb.Worksheets("Report")
+
+clear the pivot table
+clear_pts(ws_report)
+
+-------------------------------------------------------------------------------
+
+r"C:\Users\Mani.Nagaraj\Downloads"
+
+(3/3/2025)
+
+Code is working fine now in local not in instance level or repo level i want to work on that today, 
+install github with copolit and see some of youtube videos how to install or else i want raise permission for it, that we want check.
+mscom techology is not fisiable with linux os as mentioned by chris in the jira ticket, soo taking up the pandas data frame for it again.
+
+
+ 
+
+
+
+
+
+

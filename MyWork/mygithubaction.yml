@@ -1,0 +1,25 @@
+name : cloning the code and setup the terraform
+on :
+  push : 
+    branches : 
+      - main
+      - develop
+
+jobs:
+    name : code cloning and setup the terraform
+    runs-on : ubuntu-latest
+    steps :
+          - name: clone the code
+            uses: action/checkout@v2
+
+          - name: terraform setup
+            uses: "hashicorp/setup-terraform@v1"
+
+          - name: terraform initialzation
+            run: terraform init
+
+          - name: terraform validation
+            run: terrafomr validate
+          
+
+     

@@ -1,0 +1,26 @@
+primiray thing is to add the o series version
+create the ticket for oseries 1:1 engineering ( refer the raj ticket in group to create it)
+load test and call jayush about the yesterday one
+start the video shared by jeff in the group 
+
+
+-----------------------------------------------------------------------------
+
+jq install or not?
+
+renew mfa setup
+
+-----------------------------------------
+
+3/3/2025
+Now code is working fine but in local not in instance or repo level, so want work on that python code level.
+want see some videos on how to install github with copoilt, see if i want get the permission for it.
+
+5/3/2025
+update the powershell to 7.1
+checkout the docker issue in ubuntu terminal and fix the renew mfa issue by contacting the andy.
+
+
+-------------------------------------------------
+AWS password :- 84757hbdbfjs##{HRR
+Encora pass :- Kemp@tid9036
