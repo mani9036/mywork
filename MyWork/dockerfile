@@ -1,4 +1,5 @@
 #production ready dockerfile for my refernces
+#multi stage build for nodejs and nginx
 FROM node:20-alphine AS builder
 WORKDIR /app
 COPY package*.json .
@@ -16,3 +17,14 @@ HEALTHCHECK --interval=30s \
             --retries=3 \
 CMD wget --spider http://localhost/ || exit 1
 CMD ["nginx" , "-g" , "daemon off;"]
+
+-------------------------------------------------------
+
+# single stage build for python
+
+FROM python:3.12-alphine
+WORKDIR /app
+COPY requirements.txt .
+COPY app.py .
+RUN pip install -r requirements.txt
+ENTRYPOINT ["python", "app.py"]

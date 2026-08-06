@@ -53,3 +53,29 @@ Uptime: up 10 days
 Kernel: 5.15.0
 
 --------------------------------
+# each ball name having suffix with number, we want to figure out wheather the ball
+# is an odd or even ball.
+
+# question 
+# balls = ("balli" "ball2" "balls" "ball4" "halls" "ball6")
+
+# write a bash script to check whether the ball is odd or even ball.
+
+#!/bin/bash
+balls = ("balli" "ball2" "balls" "ball4" "halls" "ball6")
+for ball in "${balls[@]}"
+do
+
+last_char="${ball: -1}"  # get the last character of the ball name
+
+if [[ "$last_char" =~ [0-9] ]]; then  # check if the last character is a digit
+    if (( last_char % 2 == 0 )); then
+        echo "$ball is an even ball."
+    else
+        echo "$ball is an odd ball."
+    fi
+else
+    echo "$ball does not have a numeric suffix."
+fi
+
+done
