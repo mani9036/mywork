@@ -52,7 +52,7 @@ Hostname: server3
 Uptime: up 10 days
 Kernel: 5.15.0
 
---------------------------------
+----------------------------------------------------------------------------------------------
 # each ball name having suffix with number, we want to figure out wheather the ball
 # is an odd or even ball.
 

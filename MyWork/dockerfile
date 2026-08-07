@@ -18,6 +18,20 @@ HEALTHCHECK --interval=30s \
 CMD wget --spider http://localhost/ || exit 1
 CMD ["nginx" , "-g" , "daemon off;"]
 
+# wget is a command-line utility used to make HTTP requests and download files.
+# --spider means:
+
+# Check whether the URL is accessible, but don't actually download the content.
+
+# command1 || command2
+# Run command2 only if command1 fails.
+# exit 1
+# means:
+
+# Exit with a failure status.
+
+# 0 generally means success, while a non-zero value means failure.
+
 -------------------------------------------------------
 
 # single stage build for python
