@@ -1,0 +1,120 @@
+pipeline {
+
+    agent any
+
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'uat', 'prod'],
+            description: 'Select environment'
+        )
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh './build.sh'
+            }
+        }
+
+        stage('Unit Test') {
+            when {
+                anyOf {
+                    branch 'develop'
+                    branch 'main'
+                }
+            }
+
+            steps {
+                sh './run-tests.sh'
+            }
+        }
+
+        stage('Deploy DEV') {
+            when {
+                allOf {
+                    branch 'develop'
+
+                    expression {
+                        params.ENVIRONMENT == 'dev'
+                    }
+                }
+            }
+
+            steps {
+                sh 'kubectl apply -f k8s/dev/'
+            }
+        }
+
+        stage('Deploy UAT') {
+            when {
+                allOf {
+                    branch 'release'
+
+                    expression {
+                        params.ENVIRONMENT == 'uat'
+                    }
+                }
+            }
+
+            steps {
+                sh 'kubectl apply -f k8s/uat/'
+            }
+        }
+
+        stage('Approve PROD') {
+            when {
+                allOf {
+                    branch 'main'
+
+                    expression {
+                        params.ENVIRONMENT == 'prod'
+                    }
+                }
+            }
+
+            steps {
+                input message: 'Do you want to deploy to PROD?',
+                      ok: 'Deploy'
+            }
+        }
+
+        stage('Deploy PROD') {
+            when {
+                allOf {
+                    branch 'main'
+
+                    expression {
+                        params.ENVIRONMENT == 'prod'
+                    }
+                }
+            }
+
+            steps {
+                sh 'kubectl apply -f k8s/prod/'
+            }
+        }
+    }
+
+    post {
+
+        success {
+            echo 'Pipeline completed successfully'
+        }
+
+        failure {
+            echo 'Pipeline failed'
+        }
+
+        always {
+            echo 'Pipeline execution completed'
+        }
+    }
+}
