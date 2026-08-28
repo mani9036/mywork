@@ -6,11 +6,12 @@ on :
       - develop
 
 jobs:
+  terraform : 
     name : code cloning and setup the terraform
     runs-on : ubuntu-latest
     steps :
           - name: clone the code
-            uses: action/checkout@v2
+            uses: actions/checkout@v2
 
           - name: terraform setup
             uses: "hashicorp/setup-terraform@v1"
@@ -19,7 +20,7 @@ jobs:
             run: terraform init
 
           - name: terraform validation
-            run: terrafomr validate
+            run: terraform validate
           
 
      
