@@ -1,4 +1,4 @@
-name : cloning the code and setup the terraform
+name : cloning the code and setup the terraform   #workflow name
 on :
   push : 
     branches : 
@@ -6,15 +6,15 @@ on :
       - develop
 
 jobs:
-  terraform : 
-    name : code cloning and setup the terraform
+  terraform :                                       #job id
+    name : code cloning and setup the terraform     #job name
     runs-on : ubuntu-latest
     steps :
           - name: clone the code
             uses: actions/checkout@v2
 
           - name: terraform setup
-            uses: "hashicorp/setup-terraform@v1"
+            uses: hashicorp/setup-terraform@v1
 
           - name: terraform initialzation
             run: terraform init
